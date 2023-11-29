@@ -1,0 +1,44 @@
+body {
+
+    font-family: Arial, sans-serif;
+
+    background-image: url('/static/cityback.png'); /* Update with the path to your background image */
+      background-position: center center; /* Centers the image */
+      background-size: cover; /* Scales the background image to cover the entire container */
+
+      background-attachment: fixed; /* Optional: Sets the background image to not move on scroll */
+
+
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
+
+.container {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 0px 10px 0px #00000033;
+    width: 300px;
+}
+.btn {
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    cursor: pointer;
+    width: 100%;
+    font-size: 18px;
+    border-radius: 5px;
+}
+input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
