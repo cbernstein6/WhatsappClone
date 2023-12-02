@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat Application</title>
+    <link rel="stylesheet" href="static/chat.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500&display=swap" rel="stylesheet">
+
+</head>
+<body>
+
+<header class="app-header">
+    <div class="logo-container">
+        <a href="/index">
+            <img src="static/logo.png" class="logo" alt="Logo" id="logoImage">
+        </a>
+        <img src="static/new_chat.png" class="logo" alt="New_Chat" id="newChat" title="newChat">
+    </div>
+
+    <h1>Chad's Flask Chat App</h1>
+
+    <div class="profile-container">
+        <img src="static/logos/profile.png" class="profile" alt="Profile" id="profileImage">
+        <div id="profileDropdown" class="dropdown-content">
+            <a href="#" id="myBtn">Profile</a>
+            <a href="/signin" id="logout">Log out</a>
+        </div>
+    </div>
+</header>
+
+<div class="chat-app">
+    <aside class="chat-sidebar">
+        <div class="sidebar-table">
+            <h3>New Chat</h3>
+            <form action="/searchuser" method="post">
+                <input type="text" id="searched-user" name="searched-user" placeholder="Enter Username...">
+                <button id="userSearchButton">Search</button>
+            </form>
+            {% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}{% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                    </div>
+            {% endfor %}{% endif %}{% endwith %}
+
+        </div>
+        <div class="sidebar-table">
+            <h2>Active Users</h2>
+        </div>
+        <div class="user-list">
+            <!-- User items will be dynamically injected here -->
+        </div>
+        <div class="sidebar-table">
+            <h2>All Chats</h2>
+            <input type="text" placeholder="Search chats...">
+        </div>
+        <ul class="chat-list">
+            <!-- Chat list items will be dynamically injected here -->
+        </ul>
+
+        <div class="new-chat">
+
+        </div>
+
+    </aside>
+
+    <section class="chat-main">
+        <header class="chat-header">
+            <div class="chat-user-info">
+                <h3>Chat with Someone!</h3>
+                <p>Last seen 5 minutes ago</p>
+            </div>
+        </header>
+        <div class="chat-messages">
+            <!-- Chat messages will be dynamically injected here -->
+        </div>
+        <footer class="chat-footer">
+            <form action="/sendmessage" method="post" id="send-message-form">
+                <input type="text" id="text-message" name="text-message" placeholder="Type a message...">
+                <input type="hidden" id="form-recipient-id" name="form-recipient-id">
+                <button>Send</button>
+            </form>
+
+        </footer>
+    </section>
+
+    <div id="popupChat" class="popup-chat">
+        <!-- Content of the popup chat will go here -->
+    </div>
+</div>
+
+<div id="myPopup" class="popup">
+    <!-- Popup content -->
+    <div class="popup-content">
+        <span class="close">&times;</span>
+        <p>This is a popup!</p>
+    </div>
+</div>
+
+<script src="chat.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+
+
+
+    $('#send-message-form').on('submit', function(event) {
+    event.preventDefault();  // Prevent the form from being submitted normally
+        var formData = $(this).serialize();  // Get the data from the form
+        $.ajax({
+            url: '/sendmessage',
+            type: 'post',
+            data: formData,
+            success: function(response) {
+                // This function is called if the AJAX request is successful
+                $('.chat-messages').prepend('<p>' + response + '</p>');
+                $('.chat-messages').scrollTop($('.chat-messages')[0].scrollHeight);
+            }
+        });
+    });
+
+
+    // Get the popup
+    var popup = document.getElementById("myPopup");
+
+    // Get the button that opens the popup
+    var btn = document.getElementById("myBtn");
+
+    // Get the <span> element that closes the popup
+    var span = document.getElementsByClassName("close")[0];
+
+    // When the user clicks the button, open the popup
+    btn.onclick = function() {
+      popup.style.display = "block";
+    }
+
+    // When the user clicks on <span> (x), close the popup
+    span.onclick = function() {
+      popup.style.display = "none";
+    }
+
+    // When the user clicks anywhere outside of the popup, close it
+    window.onclick = function(event) {
+      if (event.target == popup) {
+        popup.style.display = "none";
+      }
+    }//end of popup
+
+    var recipient_id = 'Default';
+    document.getElementById('userSearchButton').addEventListener('click', function() {
+        event.preventDefault();
+        var username = document.getElementById('searched-user').value;
+        fetch('/searchuser', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({user: username})
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.username) {
+                document.querySelector('.chat-header .chat-user-info h3').textContent = 'Chat with ' + data.username;
+                recipient_id = data.username;
+                document.getElementById('form-recipient-id').value = recipient_id;
+
+            } else {
+                // Handle case where user is not found
+                alert('User not found');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+});
+
+
+
+
+
+document.getElementById('newChat').addEventListener('click', function() {
+    var newSection = document.getElementById('newSection');
+    if (newSection.style.display === 'none' || newSection.style.display === '') {
+        newSection.style.display = 'block';
+    } else {
+        newSection.style.display = 'none';
+    }
+});
+
+
+</script>
+
+</body>
+</html>
+
+
+
+
